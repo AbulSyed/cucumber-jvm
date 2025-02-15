@@ -2,7 +2,12 @@ package io.cucumber.compatibility.hooks;
 
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
 import io.cucumber.java.en.When;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Hooks {
 
@@ -14,19 +19,26 @@ public class Hooks {
     public void aStepPasses() {
     }
 
-    @When("a step throws an exception")
-    public void test() throws Exception {
-        throw new Exception("Boom");
+    @When("a step fails")
+    public void aStepFails() throws Exception {
+        throw new Exception("Exception in step");
     }
 
     @After
-    public void afterWithException() throws Exception {
+    public void after() throws Exception {
         throw new Exception("Exception in hook");
     }
 
     @After("@some-tag or @some-other-tag")
-    public void taggedAfterWithException() throws Exception {
+    public void afterTaggedWithException() throws Exception {
         throw new Exception("Exception in conditional hook");
+    }
+
+    @After("@with-attachment")
+    public void afterWithAttachment(Scenario scenario) throws Exception {
+        Path path = Paths.get("src/test/resources/features/hooks/cucumber.svg");
+        byte[] bytes = Files.readAllBytes(path);
+        scenario.attach(bytes, "image/svg", null);
     }
 
 }

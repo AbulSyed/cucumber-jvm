@@ -16,13 +16,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.nio.file.Files.newOutputStream;
+import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInRelativeOrder.containsInRelativeOrder;
@@ -51,6 +54,16 @@ public class CompatibilityTest {
 
         }
 
+        // exception: Cucumber JVM does not support markdown features
+        if ("markdown".equals(testCase.getId())) {
+            return;
+        }
+
+        // exception: Cucumber JVM does not support retrying features
+        if ("retry".equals(testCase.getId())) {
+            return;
+        }
+
         List<JsonNode> expected = readAllMessages(testCase.getExpectedFile());
         List<JsonNode> actual = readAllMessages(outputNdjson);
 
@@ -70,6 +83,11 @@ public class CompatibilityTest {
             expectedEnvelopes.remove("testStepStarted");
             expectedEnvelopes.remove("testStepFinished");
             expectedEnvelopes.remove("testCaseFinished");
+        }
+        // exception: Cucumber JVM does not support named hooks
+        if ("hooks".equals(testCase.getId())) {
+            expectedEnvelopes.getOrDefault("hook", emptyList())
+                    .removeIf(hook -> hook.get("name") != null);
         }
 
         expectedEnvelopes.forEach((messageType, expectedMessages) -> assertThat(

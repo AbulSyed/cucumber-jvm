@@ -2,6 +2,7 @@ package io.cucumber.compatibility.attachments;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 
 import java.io.IOException;
@@ -75,4 +76,5 @@ public class Attachments {
     public void aLinkToIsAttached(String uri) {
         scenario.attach(uri, "text/uri-list", null);
     }
+
 }
